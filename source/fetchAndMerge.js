@@ -9,37 +9,36 @@
  */
 async function fetchAndMerge(urls) {
     try {
-        // Гуляем по URL'ам
-        const fetchPromises = urls.map(url => fetch(url).then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-            }
-            return response.json();
-        }));
-
-        // Дожидаемся ответов
-        const results = await Promise.all(fetchPromises);
-
-
-        // Перекладываем JSON'чики
-        const mergedData = {};
-
-        results.forEach(data => {
-            for (const [key, value] of Object.entries(data)) {
-                if (!mergedData[key]) {
-                    mergedData[key] = new Set();
-                }
-                mergedData[key].add(value);
-            }
-        });
-
-        // Превращаем множества в массивы
-        const answer = {};
-        for (const [key, values] of Object.entries(mergedData)) {
-            answer[key] = Array.from(values);
+    // Гуляем по URL'ам
+    const fetchPromises = urls.map(url => fetch(url).then(response => {
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
         }
+        return response.json();
+    }));
 
-        return answer;
+    // Дожидаемся ответов
+    const results = await Promise.all(fetchPromises);
+
+
+    // Перекладываем JSON'чики
+    const mergedData = results.reduce((res, data) => {
+        for (const [key, value] of Object.entries(data)) {
+            if (!res[key]) {
+                res[key] = new Set();
+            }
+            res[key].add(value);
+        }
+        return res;
+    }, {});
+
+    // Превращаем множества в массивы
+    const answer = Object.entries(mergedData).reduce((res, [key, values]) => {
+        res[key] = Array.from(values);
+        return res;
+    }, {});
+
+    return answer;
     } catch (error) {
         return {};
     }

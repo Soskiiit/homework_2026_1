@@ -8,13 +8,6 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
             'https://vk.example.com/vkid',
             'https://mailru.example.com/mailid',
         ];
-        const expected = {
-            "age": [25, 22],
-            "id": [1, 2],
-            "name": ["Олег", "Мария"],
-            "surname": ["Петров", "Иванова"],
-            "status": ["Дуров, верни стену!"],
-        };
         
         window.fetch = (url) => {
             const data = {
@@ -28,6 +21,14 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
             });
         };
 
+        const expected = {
+            "age": [25, 22],
+            "id": [1, 2],
+            "name": ["Олег", "Мария"],
+            "surname": ["Петров", "Иванова"],
+            "status": ["Дуров, верни стену!"],
+        };
+
         const result = await fetchAndMerge(urls);
         assert.deepEqual(result, expected, "Должно правильно объединять данные с разных URL");
     });
@@ -39,17 +40,14 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
         ];
 
         window.fetch = () => Promise.reject(new Error("Network error"));
+        const expected = {};
 
         const result = await fetchAndMerge(urls);
-        assert.deepEqual(result, {}, "Должно возвращать пустой объект при ошибке fetch");
+        assert.deepEqual(result, expected, "Должно возвращать пустой объект при ошибке fetch");
     });
 
     QUnit.test("Игнорирует дублирующиеся значения", async function(assert) {
         const urls = ['https://vk.example.com/data1', 'https://vk.example.com/data2'];
-        const expected = {
-            "id": [1],
-            "role": ["user", "admin"]
-        };
         
         window.fetch = (url) => {
             const data = {
@@ -61,6 +59,11 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
                 json: () => Promise.resolve(data[url])
             });
         };
+
+        const expected = {
+            "id": [1],
+            "role": ["user", "admin"]
+        };
         
         const result = await fetchAndMerge(urls);
         assert.deepEqual(result, expected, "Должно возвращать массив и исключать дубликаты");
@@ -68,10 +71,6 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
 
     QUnit.test("Корректно обрабатывает непересекающиеся ключи", async function(assert) {
         const urls = ['https://some.info.com/a', 'https://some.info.com/b'];
-        const expected = {
-            "a": [1],
-            "b": [2]
-        };
         
         window.fetch = (url) => {
             const data = {
@@ -82,6 +81,11 @@ QUnit.module("Тестируем функцию fetchAndMerge", function() {
                 ok: true,
                 json: () => Promise.resolve(data[url])
             });
+        };
+
+        const expected = {
+            "a": [1],
+            "b": [2]
         };
         
         const result = await fetchAndMerge(urls);
