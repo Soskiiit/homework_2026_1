@@ -20,7 +20,6 @@ async function fetchAndMerge(urls) {
     // Дожидаемся ответов
     const results = await Promise.all(fetchPromises);
 
-
     // Перекладываем JSON'чики
     const mergedData = results.reduce((res, data) => {
         for (const [key, value] of Object.entries(data)) {
@@ -33,12 +32,10 @@ async function fetchAndMerge(urls) {
     }, {});
 
     // Превращаем множества в массивы
-    const answer = Object.entries(mergedData).reduce((res, [key, values]) => {
+    return Object.entries(mergedData).reduce((res, [key, values]) => {
         res[key] = Array.from(values);
         return res;
     }, {});
-
-    return answer;
     } catch (error) {
         return {};
     }
