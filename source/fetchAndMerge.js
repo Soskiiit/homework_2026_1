@@ -22,13 +22,12 @@ async function fetchAndMerge(urls) {
 
     // Перекладываем JSON'чики
     const mergedData = results.reduce((res, data) => {
-        Object.entries(data).reduce((result, [key, value]) => {
+        Object.entries(data).forEach(([key, value]) => {
             if (!res[key]) {
                 res[key] = new Set();
             }
             res[key].add(value);
-        }, {})
-
+        })
         return res;
     }, {});
 
