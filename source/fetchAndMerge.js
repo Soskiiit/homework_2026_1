@@ -7,7 +7,7 @@
  * @param {string[]} urls - Массив URL'ов для загрузки
  * @returns {Promise<Object>} - Промис с объединенным объектом данных
  */
-async function fetchAndMerge(urls) {
+const fetchAndMerge = async urls => {
     try {
     // Гуляем по URL'ам
     const fetchPromises = urls.map(url => fetch(url).then(response => {
